@@ -34,7 +34,7 @@ lmfauto = function(plot = FALSE, hmin = 2)
     lidR:::assert_is_valid_context(lidR:::LIDRCONTEXTITD, "lmfauto")
 
     # Step 1: detection with a fixed 5 m windows size
-    ttop5 <- lidR::find_trees(las, lidR::lmf(5))
+    ttop5 <- lidR::locate_trees(las, lmfx(5))
 
     # Step 2: raw/rough/poor estimate of number of trees per ha in
     # the local neighourhood
@@ -43,7 +43,7 @@ lmfauto = function(plot = FALSE, hmin = 2)
     {
       # Limit case if we are not processing a wide area
       A     <- lidR::area(las)
-      d     <- nrow(las@data)/A
+      d     <- lidR::npoints(las)/A
       Aha   <- 10000/A
       ntop5 <- nrow(ttop5)*Aha
     }
@@ -52,8 +52,8 @@ lmfauto = function(plot = FALSE, hmin = 2)
       # The real algorithm
       A     <- 400
       Aha   <- 10000/A
-      x     <- ttop5@coords[,1]
-      y     <- ttop5@coords[,2]
+      x     <- st_coordinates(ttop5)[, "X"]
+      y     <- st_coordinates(ttop5)[, "Y"]
       ntop5 <- C_count_in_disc(x, y, las@data$X, las@data$Y, sqrt(A/pi), lidR:::getThread())
       ntop5 <- ntop5*Aha
     }
