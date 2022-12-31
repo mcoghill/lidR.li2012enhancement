@@ -16,6 +16,7 @@ LAS::LAS(S4 las, int ncpu)
   this->X = data["X"];
   this->Y = data["Y"];
   this->Z = data["Z"];
+  this->is_lm = data["is_lm"];
 
   if (data.containsElementNamed("Intensity"))
     this->I = data["Intensity"];
