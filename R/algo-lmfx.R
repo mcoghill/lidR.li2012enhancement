@@ -45,7 +45,7 @@ lmfx = function(ws, hmin = 2, dist_2d = 3)
     }
     else if (is.function(ws))
     {
-      n  = nrow(las@data)
+      n  = npoints(las)
       ws = ws(las@data$Z)
 
       if (!is.numeric(ws)) stop("The function 'ws' did not return correct output. ", call. = FALSE)
@@ -57,9 +57,10 @@ lmfx = function(ws, hmin = 2, dist_2d = 3)
       stop("'ws' must be a number or a function", call. = FALSE)
 
     . <- X <- Y <- Z <- treeID <- NULL
-    las = lidR::decimate_points(las, lidR::highest(1))
-    is_maxima = lidR:::C_lmf(las, ws, hmin, TRUE, lidR:::getThread())
-    LM = las@data[is_maxima, .(X,Y,Z)]
+    las_dec = lidR::decimate_points(las, lidR::highest(1))
+    lidR:::force_autoindex(las_dec) <- lidR:::LIDRGRIDPARTITION
+    is_maxima = lidR:::C_lmf(las_dec, ws, hmin, TRUE, lidR:::getThread())
+    LM = las_dec@data[is_maxima, .(X,Y,Z)]
 
     data.table::setorder(LM, -Z)
 
@@ -77,15 +78,13 @@ lmfx = function(ws, hmin = 2, dist_2d = 3)
       }
     }
 
-    detected = LM[detected]
-    detected[, treeID := 1:.N]
+    detected = LM[detected, ][, treePres := TRUE]
 
-    output = sp::SpatialPointsDataFrame(detected[, 1:2], detected[, 3:4])
-    output@proj4string = lidR::projection(las, FALSE)
-    output@bbox = sp::bbox(las)
-    return(output)
+    output = merge(las@data, detected, by = c("X", "Y", "Z"), all = TRUE)
+    output$treePres[is.na(output$treePres)] <- FALSE
+    return(output$treePres)
   }
 
-  class(f) <- c(lidR:::LIDRALGORITHMITD)
+  f <- plugin_itd(f, omp = TRUE, raster_based = FALSE)
   return(f)
 }

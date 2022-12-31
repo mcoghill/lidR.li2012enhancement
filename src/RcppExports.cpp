@@ -11,41 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// C_hamraz_segmentation
-List C_hamraz_segmentation(S4 disc, double nps, int sensitivity, double MDCW, double Epsilon, double CLc, double CLs, double Oc, double Os, double radius);
-RcppExport SEXP _lidRplugins_C_hamraz_segmentation(SEXP discSEXP, SEXP npsSEXP, SEXP sensitivitySEXP, SEXP MDCWSEXP, SEXP EpsilonSEXP, SEXP CLcSEXP, SEXP CLsSEXP, SEXP OcSEXP, SEXP OsSEXP, SEXP radiusSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< S4 >::type disc(discSEXP);
-    Rcpp::traits::input_parameter< double >::type nps(npsSEXP);
-    Rcpp::traits::input_parameter< int >::type sensitivity(sensitivitySEXP);
-    Rcpp::traits::input_parameter< double >::type MDCW(MDCWSEXP);
-    Rcpp::traits::input_parameter< double >::type Epsilon(EpsilonSEXP);
-    Rcpp::traits::input_parameter< double >::type CLc(CLcSEXP);
-    Rcpp::traits::input_parameter< double >::type CLs(CLsSEXP);
-    Rcpp::traits::input_parameter< double >::type Oc(OcSEXP);
-    Rcpp::traits::input_parameter< double >::type Os(OsSEXP);
-    Rcpp::traits::input_parameter< double >::type radius(radiusSEXP);
-    rcpp_result_gen = Rcpp::wrap(C_hamraz_segmentation(disc, nps, sensitivity, MDCW, Epsilon, CLc, CLs, Oc, Os, radius));
-    return rcpp_result_gen;
-END_RCPP
-}
-// C_lastrees_ptrees
-Rcpp::List C_lastrees_ptrees(Rcpp::S4 las, std::vector<int> k_values, double hmin, int nmax, bool segmentation);
-RcppExport SEXP _lidRplugins_C_lastrees_ptrees(SEXP lasSEXP, SEXP k_valuesSEXP, SEXP hminSEXP, SEXP nmaxSEXP, SEXP segmentationSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::S4 >::type las(lasSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type k_values(k_valuesSEXP);
-    Rcpp::traits::input_parameter< double >::type hmin(hminSEXP);
-    Rcpp::traits::input_parameter< int >::type nmax(nmaxSEXP);
-    Rcpp::traits::input_parameter< bool >::type segmentation(segmentationSEXP);
-    rcpp_result_gen = Rcpp::wrap(C_lastrees_ptrees(las, k_values, hmin, nmax, segmentation));
-    return rcpp_result_gen;
-END_RCPP
-}
 // C_count_in_disc
 IntegerVector C_count_in_disc(NumericVector X, NumericVector Y, NumericVector x, NumericVector y, double radius, int ncpu);
 RcppExport SEXP _lidRplugins_C_count_in_disc(SEXP XSEXP, SEXP YSEXP, SEXP xSEXP, SEXP ySEXP, SEXP radiusSEXP, SEXP ncpuSEXP) {
@@ -61,11 +26,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// C_li2012_auto
+IntegerVector C_li2012_auto(S4 las, double dt1, double dt2, double Zu, double th_tree, double radius);
+RcppExport SEXP _lidRplugins_C_li2012_auto(SEXP lasSEXP, SEXP dt1SEXP, SEXP dt2SEXP, SEXP ZuSEXP, SEXP th_treeSEXP, SEXP radiusSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< S4 >::type las(lasSEXP);
+    Rcpp::traits::input_parameter< double >::type dt1(dt1SEXP);
+    Rcpp::traits::input_parameter< double >::type dt2(dt2SEXP);
+    Rcpp::traits::input_parameter< double >::type Zu(ZuSEXP);
+    Rcpp::traits::input_parameter< double >::type th_tree(th_treeSEXP);
+    Rcpp::traits::input_parameter< double >::type radius(radiusSEXP);
+    rcpp_result_gen = Rcpp::wrap(C_li2012_auto(las, dt1, dt2, Zu, th_tree, radius));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_lidRplugins_C_hamraz_segmentation", (DL_FUNC) &_lidRplugins_C_hamraz_segmentation, 10},
-    {"_lidRplugins_C_lastrees_ptrees", (DL_FUNC) &_lidRplugins_C_lastrees_ptrees, 5},
     {"_lidRplugins_C_count_in_disc", (DL_FUNC) &_lidRplugins_C_count_in_disc, 6},
+    {"_lidRplugins_C_li2012_auto", (DL_FUNC) &_lidRplugins_C_li2012_auto, 6},
     {NULL, NULL, 0}
 };
 

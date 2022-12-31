@@ -43,7 +43,7 @@ lmfauto = function(plot = FALSE, hmin = 2)
     {
       # Limit case if we are not processing a wide area
       A     <- lidR::area(las)
-      d     <- lidR::npoints(las)/A
+      d     <- npoints(las)/A
       Aha   <- 10000/A
       ntop5 <- nrow(ttop5)*Aha
     }
@@ -52,8 +52,8 @@ lmfauto = function(plot = FALSE, hmin = 2)
       # The real algorithm
       A     <- 400
       Aha   <- 10000/A
-      x     <- st_coordinates(ttop5)[, "X"]
-      y     <- st_coordinates(ttop5)[, "Y"]
+      x     <- sf::st_coordinates(ttop5)[, "X"]
+      y     <- sf::st_coordinates(ttop5)[, "Y"]
       ntop5 <- C_count_in_disc(x, y, las@data$X, las@data$Y, sqrt(A/pi), lidR:::getThread())
       ntop5 <- ntop5*Aha
     }
@@ -63,11 +63,11 @@ lmfauto = function(plot = FALSE, hmin = 2)
     . <- X <- Y <- Z <- treeID <- NULL
 
     ws <- lmfauto_ws(las@data$Z, ntop5)
-    lm <- lidR:::C_lmf(las, ws, hmin, TRUE, lidR:::getThread())
-    return(lm)
+    lidR:::force_autoindex(las) <- lidR:::LIDRGRIDPARTITION
+    return(lidR:::C_lmf(las, ws, hmin, TRUE, lidR:::getThread()))
   }
 
-  class(f) <- c(lidR:::LIDRALGORITHMITD, lidR:::LIDRALGORITHMOPENMP, lidR:::LIDRALGORITHMPOINTCLOUDBASED)
+  f <- plugin_itd(f, omp = TRUE, raster_based = FALSE)
   return(f)
 }
 
