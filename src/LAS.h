@@ -9,6 +9,8 @@ class LAS
 {
 public:
   S4 las;
+  void new_filter(LogicalVector b);
+  void filter_local_maxima(NumericVector ws, double min_height, bool circular);
   NumericVector X;
   NumericVector Y;
   NumericVector Z;
@@ -18,11 +20,10 @@ public:
   unsigned int npoints;
   std::vector<bool> filter;
   std::vector<bool> skip;
-  LogicalVector is_lm;
 
 public:
   LAS(S4 las, int npcu = 1);
-  IntegerVector segment_trees_auto(double dt1, double dt2, double Zu, double th_tree, double radius);
+  IntegerVector segment_trees_auto(double dt1, double dt2, NumericVector R, double Zu, double th_tree, double radius);
 
 private:
   unsigned int sensor;

@@ -28,8 +28,8 @@ IntegerVector C_count_in_disc(NumericVector X, NumericVector Y, NumericVector x,
 }
 
 // [[Rcpp::export(rng = false)]]
-IntegerVector C_li2012_auto(S4 las, double dt1, double dt2, double Zu, double th_tree, double radius)
+IntegerVector C_li2012_auto(S4 las, double dt1, double dt2, NumericVector R, double Zu, double th_tree, double radius)
 {
   LAS pt(las);
-  return pt.segment_trees_auto(dt1, dt2, Zu, th_tree, radius);
+  return pt.segment_trees_auto(dt1, dt2, R, Zu, th_tree, radius);
 }

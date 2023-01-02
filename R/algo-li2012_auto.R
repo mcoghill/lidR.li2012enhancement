@@ -1,6 +1,6 @@
 #' Individual Tree Segmentation Algorithm
 #'
-#' This functions is made to be used in \link{segment_trees_auto}. It implements an algorithm for tree
+#' This functions is made to be used in \link{segment_trees}. It implements an algorithm for tree
 #' segmentation based on Li et al. (2012) (see reference). This method is a growing region
 #' method working at the point cloud level. It is an implementation by lidR authors, from the original
 #' paper, as close as possible from the original description. However we added a parameter \code{hmin}
@@ -12,6 +12,10 @@
 #' @param hmin numeric. Minimum height of a detected tree. Default is 2.
 #' @param Zu numeric. If point elevation is greater than Zu, \code{dt2} is used, otherwise \code{dt1} is
 #' used. See page 79 in Li et al. (2012). Default is 15.
+#' @param R numeric. Search radius. See page 79 in Li et al. (2012). Default is 2. If
+#' \code{R = 0} all the points are automatically considered as local maxima and the search step
+#' is skipped (much faster). If this value is \code{NULL}, search radius is calculated automatically
+#' using the \link{lmfxauto} method.
 #' @param speed_up numeric. Maximum radius of a crown. Any value greater than a crown is
 #' good because this parameter does not affect the result. However, it greatly affects the
 #' computation speed by restricting the number of comparisons to perform.
@@ -32,11 +36,11 @@
 #' las <- readLAS(LASfile, select = "xyz", filter = poi)
 #' col <- pastel.colors(200)
 #'
-#' las <- segment_trees(las, li2012(dt1 = 1.4))
+#' las <- segment_trees(las, li2012_auto(dt1 = 1.4))
 #' #plot(las, color = "treeID", colorPalette = col)
 #' @name its_li2012_auto
 #' @md
-li2012_auto = function(treetops, dt1 = 1.5, dt2 = 2, Zu = 15, hmin = 2, speed_up = 10, ID = "treeID")
+li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 10, ID = "treeID")
 {
   lidR:::assert_is_a_number(dt1)
   lidR:::assert_is_a_number(dt2)
@@ -49,10 +53,9 @@ li2012_auto = function(treetops, dt1 = 1.5, dt2 = 2, Zu = 15, hmin = 2, speed_up
   lidR:::assert_all_are_positive(hmin)
   lidR:::assert_all_are_positive(speed_up)
 
-  treetops <- lidR:::check_tree_tops(treetops, ID)
-  treetops <- lazyeval::uq(treetops)
   dt1      <- lazyeval::uq(dt1)
   dt2      <- lazyeval::uq(dt2)
+  R        <- lazyeval::uq(R)
   Zu       <- lazyeval::uq(Zu)
   hmin     <- lazyeval::uq(hmin)
   speed_up <- lazyeval::uq(speed_up)
@@ -68,10 +71,23 @@ li2012_auto = function(treetops, dt1 = 1.5, dt2 = 2, Zu = 15, hmin = 2, speed_up
     }
     else
     {
-      ttops <- data.table::data.table(sf::st_coordinates(treetops), is_lm = TRUE)
-      las@data <- merge(las@data, ttops, by = c("X", "Y", "Z"), all = TRUE)
-      las[["is_lm"]][is.na(las[["is_lm"]])] <- FALSE
-      return(C_li2012_auto(las, dt1, dt2, Zu, hmin, speed_up))
+      if(is.null(R))
+      {
+        # Get R from the lmfauto_ws function
+        ttop5 <- lidR::locate_trees(las, lmfx(5))
+        A     <- 400
+        Aha   <- 10000/A
+        x     <- sf::st_coordinates(ttop5)[, "X"]
+        y     <- sf::st_coordinates(ttop5)[, "Y"]
+        ntop5 <- C_count_in_disc(x, y, las@data$X, las@data$Y, sqrt(A/pi), lidR:::getThread())
+        ntop5 <- ntop5*Aha
+        R <- lmfauto_ws(las@data$Z, ntop5)
+      }
+      else
+      {
+        lidR:::assert_is_a_number(R)
+      }
+      return(C_li2012_auto(las, dt1, dt2, R, Zu, hmin, speed_up))
     }
   }
 

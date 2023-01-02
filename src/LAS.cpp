@@ -16,7 +16,6 @@ LAS::LAS(S4 las, int ncpu)
   this->X = data["X"];
   this->Y = data["Y"];
   this->Z = data["Z"];
-  this->is_lm = data["is_lm"];
 
   if (data.containsElementNamed("Intensity"))
     this->I = data["Intensity"];
@@ -32,7 +31,77 @@ LAS::LAS(S4 las, int ncpu)
   std::fill(skip.begin(), skip.end(), false);
 }
 
-IntegerVector LAS::segment_trees_auto(double dt1, double dt2, double Zu, double th_tree, double radius)
+void LAS::filter_local_maxima(NumericVector ws, double min_height, bool circular)
+{
+  bool abort = false;
+  bool vws = ws.length() > 1;
+
+  SpatialIndex tree(las);
+  Progress pb(npoints, "Local maximum filter: ");
+
+#pragma omp parallel for num_threads(ncpu)
+  for (unsigned int i = 0 ; i < npoints ; i++)
+  {
+    if (abort) continue;
+    if (pb.check_interrupt()) abort = true;
+    pb.increment();
+
+    double hws = (vws) ? ws[i]/2 : ws[0]/2;
+
+    if (Z[i] < min_height)
+      continue;
+
+    // Get the points within a windows centered on the current point
+    std::vector<PointXYZ> pts;
+    if(!circular)
+    {
+      Rectangle rect(X[i]-hws, X[i]+hws, Y[i]-hws, Y[i]+hws);
+      tree.lookup(rect, pts);
+    }
+    else
+    {
+      Circle circ(X[i], Y[i], hws);
+      tree.lookup(circ, pts);
+    }
+
+    // Initialize the highest point using the central point
+    PointXYZ p(X[i], Y[i], Z[i], i);
+    double zmax = Z[i];
+    bool is_lm = true;
+
+    // Search if one is higher
+    for (auto pt : pts)
+    {
+      double z = pt.z;
+
+      // Found one higher, it is not a LM
+      if(z > zmax)
+      {
+        is_lm = false;
+        break;
+      }
+
+      // Found one equal. If this one was already tagged LM we can't have two lm
+      // The first tagged has the precedence
+      if (z == zmax && filter[pt.id])
+      {
+        is_lm = false;
+        break;
+      }
+    }
+
+#pragma omp critical
+{
+  filter[i] = is_lm;
+}
+  }
+
+  if (abort) throw Rcpp::internal::InterruptedException();
+
+  return;
+}
+
+IntegerVector LAS::segment_trees_auto(double dt1, double dt2, NumericVector R, double Zu, double th_tree, double radius)
 {
   double xmin = min(X);
   double ymin = min(Y);
@@ -57,6 +126,19 @@ IntegerVector LAS::segment_trees_auto(double dt1, double dt2, double Zu, double 
   // Li, W., Guo, Q., Jakubowski, M. K., & Kelly, M. (2012). A New Method for Segmenting Individual
   // Trees from the Lidar Point Cloud. Photogrammetric Engineering & Remote Sensing, 78(1), 75–84.
   // https://doi.org/10.14358/PERS.78.1.75
+
+  // Find if a point is a local maxima within an R windows
+  LogicalVector is_lm;
+  if (R.length() > 1 || R[0] > 0)
+  {
+    filter_local_maxima(R, 0, true);
+    is_lm = Rcpp::wrap(filter);
+  }
+  else
+  {
+    is_lm = LogicalVector(ni);
+    std::fill(is_lm.begin(), is_lm.end(), true);
+  }
 
   // A progress bar and abort options
   Progress p(ni, "Tree segmentation: ");
