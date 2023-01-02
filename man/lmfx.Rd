@@ -20,7 +20,7 @@ cannot be a local maxima. Default 2.}
 if there is no detected tree within this 2D distance.}
 }
 \description{
-This function is made to be used in \link[lidR:find_trees]{find_trees}. It implements an
+This function is made to be used in \link[lidR:locate_trees]{locate_trees}. It implements an
 experimental algorithms for tree detection based on a several ideas from the litterature. First it
 select the highest points in each cell of a 1 m grid to reduce the amount of data and considerably
 improve speed, then it performs a local maximum filter to find tree tops. To finish it applies the
