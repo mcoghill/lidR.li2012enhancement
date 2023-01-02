@@ -5,7 +5,7 @@ C_count_in_disc <- function(X, Y, x, y, radius, ncpu) {
     .Call('_lidRplugins_C_count_in_disc', PACKAGE = 'lidRplugins', X, Y, x, y, radius, ncpu)
 }
 
-C_li2012_auto <- function(las, dt1, dt2, Zu, th_tree, radius) {
-    .Call('_lidRplugins_C_li2012_auto', PACKAGE = 'lidRplugins', las, dt1, dt2, Zu, th_tree, radius)
+C_li2012_auto <- function(las, dt1, dt2, R, Zu, th_tree, radius) {
+    .Call('_lidRplugins_C_li2012_auto', PACKAGE = 'lidRplugins', las, dt1, dt2, R, Zu, th_tree, radius)
 }
 
