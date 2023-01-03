@@ -12,7 +12,8 @@ li2012_auto(
   Zu = 15,
   hmin = 2,
   speed_up = 10,
-  ID = "treeID"
+  ID = "treeID",
+  R_args = "Z"
 )
 }
 \arguments{
@@ -20,10 +21,13 @@ li2012_auto(
 
 \item{dt2}{numeric. Threshold number 2. See reference page 79 in Li et al. (2012). Default is 2.}
 
-\item{R}{numeric. Search radius. See page 79 in Li et al. (2012). Default is 2. If
+\item{R}{numeric, function, or \code{NULL}. Search radius. See page 79 in Li et al. (2012). Default is 2. If
 \code{R = 0} all the points are automatically considered as local maxima and the search step
 is skipped (much faster). If this value is \code{NULL}, search radius is calculated automatically
-using the \link{lmfxauto} method.}
+using the \link{lmfxauto} method (much slower). If it is a function, the function determines the size of
+the window at any given location on the canopy. By default function takes the height of a given pixel or
+point as its only argument and return the desired size of the search window when centered on that
+pixel/point. This can be controlled with the 'R_args' parameter.}
 
 \item{Zu}{numeric. If point elevation is greater than Zu, \code{dt2} is used, otherwise \code{dt1} is
 used. See page 79 in Li et al. (2012). Default is 15.}
@@ -34,6 +38,8 @@ used. See page 79 in Li et al. (2012). Default is 15.}
 good because this parameter does not affect the result. However, it greatly affects the
 computation speed by restricting the number of comparisons to perform.
 The lower the value, the faster the method. Default is 10.}
+
+\item{R_args}{list. Named list of argument for the function 'R' if 'R' is a function.}
 }
 \description{
 This functions is made to be used in \link{segment_trees}. It implements an algorithm for tree
