@@ -5,6 +5,8 @@
 
 using namespace lidR;
 
+// Copied functions from lidR package
+
 LAS::LAS(S4 las, int ncpu)
 {
   Rcpp::List index = las.slot("index");
