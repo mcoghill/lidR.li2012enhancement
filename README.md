@@ -1,46 +1,23 @@
 ![license](https://img.shields.io/badge/Licence-GPL--3-blue.svg) 
-[![Travis build status](https://travis-ci.org/Jean-Romain/lidRplugins.svg?branch=master)](https://travis-ci.com/Jean-Romain/lidRplugins)
-[![Codecov test coverage](https://codecov.io/gh/Jean-Romain/lidRplugins/branch/master/graph/badge.svg)](https://codecov.io/gh/Jean-Romain/lidRplugins?branch=master)
-![Lifecycle:Dormant](https://img.shields.io/badge/Lifecycle-Dormant-ff7f2a)
 
-This package contains functions and algorithms to extend the [lidR](https://github.com/r-lidar/lidR) package (versions >= 4.0.0). These functions or algorithms are not yet or will not be included in the `lidR` package either because they are:
+This package was originally forked from [`lidRplugins`](https://github.com/Jean-Romain/lidRplugins), and extends the `li2012()` tree segmentation function to adjust the constraints of the `R` parameter contained within the main [`lidR`](https://github.com/r-lidar/lidR) package. Thank you Jean-Romain for both of these packages and for your valuable input!
 
-- :microscope: **Experimental** and not supported by a peer-reviewed and accessible publications.
-- :zap: **Non suitable for `lidR`**  usually because they are not sufficiently efficient. 
-- :warning: **Not tested enought** and I'm not sure they are sufficiently robust.
-- :octocat: **Require extra packages** available on github but not on CRAN
+Here, I introduce a new idea for being able to adjust the `R` value of the `li2012()` tree segmentation algorithm in a couple of new ways:
 
-This package will NOT be submitted on CRAN and must be installed from github. It depends on `lidR (>= 4.0.0)` and should be seen as a laboratory with more or less interesting content inside.  
+1. Specifying `NULL` --> This will enable automatic window sizes to be created for each point using the `lmfxauto()` algorithm. These values get passed to the into the `filter_local_maxima` C++ function to find the local maximas;
+2. Specifying a function for defining window sizes. This functionality is introduced in the original `lmf()` function from the `lidR` package to adjust the `ws` parameter;
+3. Specifying a numeric value. This reverts to the default `li2012()` function usage.
 
-## Features
-
-### Lake delineation :microscope:
-
-Lake delineation from point cloud using `delineate_lakes()`
-
-<img src="./.img/lakes.png" width="700px"/>
-
-### Powerline segmentation :microscope: :warning:
-
-Powerline segmentation from point cloud using `find_transmissiontowers()`, `classify_transmissiontowers()`, `classify_wires()`, `track_wires()`
-
-<img src="./.img/powerlines.png" width="500px"/>
-
-### Various tree detection/segmentation from peer-reviewed papers :zap:
-
-- `ptree()`: Vega, C., Hamrouni, a., El Mokhtari, S., Morel, J., Bock, J., Renaud, J.-P., … Durrieu, S. (2014). PTrees: A point-based approach to forest tree extraction from lidar data. International Journal of Applied Earth Observation and Geoinformation, 33, 98–108. https://doi.org/10.1016/j.jag.2014.05.001
-- `hamraz2016()`: Hamraz, H., Contreras, M. A., & Zhang, J. (2016). A robust approach for tree segmentation in deciduous forests using small-footprint airborne LiDAR data. International Journal of Applied Earth Observation and Geoinformation, 52, 532–541. https://doi.org/10.1016/j.cageo.2017.02.017
-- `LayerStacking()`: Ayrey, E., Fraver, S., Kershaw, J. A., Kenefic, L. S., Hayes, D., Weiskittel, A. R., & Roth, B. E. (2017). Layer Stacking: A Novel Algorithm for Individual Forest Tree Segmentation from LiDAR Point Clouds. Canadian Journal of Remote Sensing, 43(1), 16–27. https://doi.org/10.1080/07038992.2017.1252907
-- `multichm()`: Eysn, L., Hollaus, M., Lindberg, E., Berger, F., Monnet, J. M., Dalponte, M., … Pfeifer, N. (2015). A benchmark of lidar-based single tree detection methods using heterogeneous forest data from the Alpine Space. Forests, 6(5), 1721–1747. https://doi.org/10.3390/f6051721
+Other algorithms, functions, and package exports from the `lidRplugins` package have been stripped away here so that the new `li2012_auto()` function may be focussed on. Testers of this implementation are welcome and feedback would be appreciated!  
 
 ### Parameter free tree detection :microscope:
 
-`lmfauto()` is a fast algorithm for individual tree detection with 0 parameters designed to process thousands of square kilometres without supervision.
+`lmfxauto()` is a fast algorithm for individual tree detection with 0 parameters designed to process thousands of square kilometres without supervision. It is based on [`lmfauto()`](https://github.com/Jean-Romain/lidRplugins/blob/master/R/algo-lmfauto.R) from the `lidRplugins` package where the first step is changed to use `lmfx(5)` instead of `lmf(5)`.
 
 ## Installation
 
 ```r
-remotes::install_github("Jean-Romain/lidRplugins")
+remotes::install_github("mcoghill/lidR_li2012_enhancement")
 ```
 
 To install the package from github make sure you have a working development environment.
