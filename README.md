@@ -17,7 +17,7 @@ Other algorithms, functions, and package exports from the `lidRplugins` package 
 ## Installation
 
 ```r
-remotes::install_github("mcoghill/lidR_li2012_enhancement")
+remotes::install_github("mcoghill/lidR.li2012enhancement")
 ```
 
 To install the package from github make sure you have a working development environment.
