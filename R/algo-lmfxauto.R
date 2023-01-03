@@ -43,7 +43,6 @@ lmfxauto = function(plot = FALSE, hmin = 2)
     {
       # Limit case if we are not processing a wide area
       A     <- lidR::area(las)
-      d     <- npoints(las)/A
       Aha   <- 10000/A
       ntop5 <- nrow(ttop5)*Aha
     }
@@ -57,12 +56,13 @@ lmfxauto = function(plot = FALSE, hmin = 2)
       ntop5 <- C_count_in_disc(x, y, las@data$X, las@data$Y, sqrt(A/pi), lidR:::getThread())
       ntop5 <- ntop5*Aha
     }
+    d     <- density(las)
 
     # Step 3: estimate the window size of a variable window size LMF as a function
     # of the number of trees in the local neighborhood.
     . <- X <- Y <- Z <- treeID <- NULL
 
-    ws <- lmfauto_ws(las@data$Z, ntop5)
+    ws <- lmfauto_ws(las@data$Z, ntop5, d)
     lidR:::force_autoindex(las) <- lidR:::LIDRGRIDPARTITION
     return(lidR:::C_lmf(las, ws, hmin, TRUE, lidR:::getThread()))
   }
