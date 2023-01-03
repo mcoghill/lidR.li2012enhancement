@@ -13,7 +13,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // C_count_in_disc
 IntegerVector C_count_in_disc(NumericVector X, NumericVector Y, NumericVector x, NumericVector y, double radius, int ncpu);
-RcppExport SEXP _lidRplugins_C_count_in_disc(SEXP XSEXP, SEXP YSEXP, SEXP xSEXP, SEXP ySEXP, SEXP radiusSEXP, SEXP ncpuSEXP) {
+RcppExport SEXP _lidR_li2012enhancement_C_count_in_disc(SEXP XSEXP, SEXP YSEXP, SEXP xSEXP, SEXP ySEXP, SEXP radiusSEXP, SEXP ncpuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< NumericVector >::type X(XSEXP);
@@ -28,7 +28,7 @@ END_RCPP
 }
 // C_li2012_auto
 IntegerVector C_li2012_auto(S4 las, double dt1, double dt2, NumericVector R, double Zu, double th_tree, double radius);
-RcppExport SEXP _lidRplugins_C_li2012_auto(SEXP lasSEXP, SEXP dt1SEXP, SEXP dt2SEXP, SEXP RSEXP, SEXP ZuSEXP, SEXP th_treeSEXP, SEXP radiusSEXP) {
+RcppExport SEXP _lidR_li2012enhancement_C_li2012_auto(SEXP lasSEXP, SEXP dt1SEXP, SEXP dt2SEXP, SEXP RSEXP, SEXP ZuSEXP, SEXP th_treeSEXP, SEXP radiusSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< S4 >::type las(lasSEXP);
@@ -44,12 +44,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_lidRplugins_C_count_in_disc", (DL_FUNC) &_lidRplugins_C_count_in_disc, 6},
-    {"_lidRplugins_C_li2012_auto", (DL_FUNC) &_lidRplugins_C_li2012_auto, 7},
+    {"_lidR_li2012enhancement_C_count_in_disc", (DL_FUNC) &_lidR_li2012enhancement_C_count_in_disc, 6},
+    {"_lidR_li2012enhancement_C_li2012_auto", (DL_FUNC) &_lidR_li2012enhancement_C_li2012_auto, 7},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_lidRplugins(DllInfo *dll) {
+RcppExport void R_init_lidR_li2012enhancement(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

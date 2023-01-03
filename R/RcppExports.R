@@ -2,10 +2,10 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 C_count_in_disc <- function(X, Y, x, y, radius, ncpu) {
-    .Call('_lidRplugins_C_count_in_disc', PACKAGE = 'lidRplugins', X, Y, x, y, radius, ncpu)
+    .Call('_lidR_li2012enhancement_C_count_in_disc', PACKAGE = 'lidR.li2012enhancement', X, Y, x, y, radius, ncpu)
 }
 
 C_li2012_auto <- function(las, dt1, dt2, R, Zu, th_tree, radius) {
-    .Call('_lidRplugins_C_li2012_auto', PACKAGE = 'lidRplugins', las, dt1, dt2, R, Zu, th_tree, radius)
+    .Call('_lidR_li2012enhancement_C_li2012_auto', PACKAGE = 'lidR.li2012enhancement', las, dt1, dt2, R, Zu, th_tree, radius)
 }
 
