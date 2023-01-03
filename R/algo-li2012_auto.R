@@ -12,14 +12,18 @@
 #' @param hmin numeric. Minimum height of a detected tree. Default is 2.
 #' @param Zu numeric. If point elevation is greater than Zu, \code{dt2} is used, otherwise \code{dt1} is
 #' used. See page 79 in Li et al. (2012). Default is 15.
-#' @param R numeric. Search radius. See page 79 in Li et al. (2012). Default is 2. If
+#' @param R numeric, function, or \code{NULL}. Search radius. See page 79 in Li et al. (2012). Default is 2. If
 #' \code{R = 0} all the points are automatically considered as local maxima and the search step
 #' is skipped (much faster). If this value is \code{NULL}, search radius is calculated automatically
-#' using the \link{lmfxauto} method.
+#' using the \link{lmfxauto} method (much slower). If it is a function, the function determines the size of
+#' the window at any given location on the canopy. By default function takes the height of a given pixel or
+#' point as its only argument and return the desired size of the search window when centered on that
+#' pixel/point. This can be controlled with the 'R_args' parameter.
 #' @param speed_up numeric. Maximum radius of a crown. Any value greater than a crown is
 #' good because this parameter does not affect the result. However, it greatly affects the
 #' computation speed by restricting the number of comparisons to perform.
 #' The lower the value, the faster the method. Default is 10.
+#' @param R_args list. Named list of argument for the function 'R' if 'R' is a function.
 #'
 #' @export
 #'
@@ -40,7 +44,7 @@
 #' #plot(las, color = "treeID", colorPalette = col)
 #' @name its_li2012_auto
 #' @md
-li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 10, ID = "treeID")
+li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 10, ID = "treeID", R_args = "Z")
 {
   lidR:::assert_is_a_number(dt1)
   lidR:::assert_is_a_number(dt2)
@@ -59,6 +63,7 @@ li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 
   Zu       <- lazyeval::uq(Zu)
   hmin     <- lazyeval::uq(hmin)
   speed_up <- lazyeval::uq(speed_up)
+  R_args   <- lazyeval::uq(R_args)
 
   f = function(las)
   {
@@ -81,7 +86,22 @@ li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 
         y     <- sf::st_coordinates(ttop5)[, "Y"]
         ntop5 <- C_count_in_disc(x, y, las@data$X, las@data$Y, sqrt(A/pi), lidR:::getThread())
         ntop5 <- ntop5*Aha
-        R <- lmfauto_ws(las@data$Z, ntop5)
+        d <- density(las)
+        R <- lmfauto_ws(las@data$Z, ntop5, d)
+      }
+      else if(is.function(R))
+      {
+        # Copied from lmf code
+        args <- lapply(R_args, function(x) if (x %in% names(las)) las@data[[x]] else x)
+        R <- do.call(R, args)
+        b <- las$Z < hmin
+        R[b] <- min(R)
+
+        n <- npoints(las)
+        if (!is.numeric(R)) stop("The function 'R' did not return a correct output. ", call. = FALSE)
+        if (any(R <= 0))    stop("The function 'R' returned negative or null values.", call. = FALSE)
+        if (anyNA(R))       stop("The function 'R' returned NA values.",               call. = FALSE)
+        if (length(R) != n) stop("The function 'R' did not return a correct output.",  call. = FALSE)
       }
       else
       {
