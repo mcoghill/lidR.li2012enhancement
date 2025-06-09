@@ -101,7 +101,7 @@ li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 
       else if(is.function(R))
       {
         # Copied from lmf code
-        args <- lapply(R_args, function(x) if (x %in% names(las)) las@data[[x]] else x)
+        args <- lapply(R_args, function(x) if (x[1] %in% names(las)) las@data[[x]] else x)
         R <- do.call(R, args)
         b <- las$Z < hmin
         R[b] <- NA
