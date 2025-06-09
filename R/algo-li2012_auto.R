@@ -100,15 +100,8 @@ li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 
       }
       else if(is.function(R))
       {
-        # Copied from lmf code
         args <- lapply(R_args, function(x) if (x[1] %in% names(las)) las@data[[x]] else x)
         R <- do.call(R, args)
-        b <- las$Z < hmin
-        R[b] <- NA
-                       
-        n <- npoints(las)
-        if (!is.numeric(R)) stop("The function 'R' did not return a correct output. ", call. = FALSE)
-        if (length(R) != n) stop("The function 'R' did not return a correct output.",  call. = FALSE)
       }
       else
       {
