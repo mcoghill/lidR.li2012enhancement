@@ -44,7 +44,7 @@
 #' #plot(las, color = "treeID", colorPalette = col)
 #' @name its_li2012_auto
 #' @md
-li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 10, ID = "treeID", R_args = "Z")
+li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 10, ID = "treeID", R_args = "Z", plot = FALSE)
 {
   lidR:::assert_is_a_number(dt1)
   lidR:::assert_is_a_number(dt2)
@@ -79,14 +79,23 @@ li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 
       if(is.null(R))
       {
         # Get R from the lmfauto_ws function
-        ttop5 <- lidR::locate_trees(las, lmfx(5))
-        A     <- 400
-        Aha   <- 10000/A
-        x     <- sf::st_coordinates(ttop5)[, "X"]
-        y     <- sf::st_coordinates(ttop5)[, "Y"]
-        ntop5 <- C_count_in_disc(x, y, las@data$X, las@data$Y, sqrt(A/pi), lidR:::getThread())
-        ntop5 <- ntop5*Aha
+        ttop5 <- lidR::locate_trees(las, lmfx(5, hmin = hmin))
         d <- density(las)
+        if(plot) 
+        {
+          A <- lidR::area(las)
+          Aha   <- 10000/A
+          ntop5 <- nrow(ttop5) * Aha
+        }
+        else
+        {
+          A     <- 400
+          Aha   <- 10000/A
+          x     <- sf::st_coordinates(ttop5)[, "X"]
+          y     <- sf::st_coordinates(ttop5)[, "Y"]
+          ntop5 <- C_count_in_disc(x, y, las@data$X, las@data$Y, sqrt(A/pi), lidR:::getThread())
+          ntop5 <- ntop5 * Aha
+        }
         R <- lmfauto_ws(las@data$Z, ntop5, d)
       }
       else if(is.function(R))
@@ -95,12 +104,10 @@ li2012_auto = function(dt1 = 1.5, dt2 = 2, R = 2, Zu = 15, hmin = 2, speed_up = 
         args <- lapply(R_args, function(x) if (x %in% names(las)) las@data[[x]] else x)
         R <- do.call(R, args)
         b <- las$Z < hmin
-        R[b] <- min(R)
-
+        R[b] <- NA
+                       
         n <- npoints(las)
         if (!is.numeric(R)) stop("The function 'R' did not return a correct output. ", call. = FALSE)
-        if (any(R <= 0))    stop("The function 'R' returned negative or null values.", call. = FALSE)
-        if (anyNA(R))       stop("The function 'R' returned NA values.",               call. = FALSE)
         if (length(R) != n) stop("The function 'R' did not return a correct output.",  call. = FALSE)
       }
       else
